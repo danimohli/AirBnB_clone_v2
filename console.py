@@ -77,26 +77,39 @@ class HBNBCommand(cmd.Cmd):
             return
         print(storage.all()[key])
 
-    def do_destroy(self, arg):
+    def do_create(self, arg):
         """
-        Destroy an instance based on the class name and id.
+        Create a new instance of BaseModel, User, State, City, Amenity,
+        Place, or Review,
+        saves it (to the JSON file), and prints the id.
+        Usage: create <Class name> <param 1> <param 2> <param 3>...
+        Param syntax: <key name>=<value>
         """
         args = arg.split()
         if not args:
             print("** class name missing **")
             return
-        if args[0] not in globals():
+        class_name = args[0]
+        if class_name not in globals():
             print("** class doesn't exist **")
             return
-        if len(args) < 2:
-            print("** instance id missing **")
-            return
-        key = f"{args[0]}.{args[1]}"
-        if key not in storage.all():
-            print("** no instance found **")
-            return
-        del storage.all()[key]
-        storage.save()
+        params = args[1:]
+
+        new_instance = eval(class_name)()
+        for param in params:
+            key, value = param.split('=')
+            value = value.strip('"')
+            if value.replace('.', '', 1).isdigit():
+                if '.' in value:
+                    value = float(value)
+                else:
+                    value = int(value)
+            elif '_' in value:
+                value = value.replace('_', ' ')
+            setattr(new_instance, key, value)
+
+        new_instance.save()
+        print(new_instance.id)
 
     def do_all(self, arg):
         """
