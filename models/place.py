@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+"""
+model comment
+"""
 from models.base_model import BaseModel
 
 
