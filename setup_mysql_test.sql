@@ -1,11 +1,3 @@
-#!/bin/bash
-
-MYSQL_USER=root
-MYSQL_PASSWORD=root_password
-
-SQL_SCRIPT=$(mktemp)
-
-cat <<EOF > $SQL_SCRIPT
 -- Create database hbnb_test_db if it doesn't exist
 CREATE DATABASE IF NOT EXISTS hbnb_test_db;
 
@@ -20,4 +12,3 @@ GRANT SELECT ON performance_schema.* TO 'hbnb_test'@'localhost';
 
 -- Flush privileges to apply changes
 FLUSH PRIVILEGES;
-EOF
