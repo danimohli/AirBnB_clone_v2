@@ -1,7 +1,6 @@
 #!/usr/bin/python3
-
 """
-Cmd or Shell for HBNB
+Cmd or Shell for HBH
 """
 
 import cmd
@@ -50,12 +49,26 @@ class HBNBCommand(cmd.Cmd):
         if not arg:
             print("** class name missing **")
             return
+        args = arg.split()
         try:
-            new_instance = eval(arg)()
-            new_instance.save()
-            print(new_instance.id)
+            cls = eval(args[0])
         except NameError:
             print("** class doesn't exist **")
+            return
+        kwargs = {}
+        for param in args[1:]:
+            key, value = param.split("=")
+            value = value.replace("_", " ")
+            if value[0] == '"':
+                value = value.strip('"').replace('\\"', '"')
+            elif '.' in value:
+                value = float(value)
+            else:
+                value = int(value)
+            kwargs[key] = value
+        new_instance = cls(**kwargs)
+        new_instance.save()
+        print(new_instance.id)
 
     def do_show(self, arg):
         """
@@ -77,39 +90,26 @@ class HBNBCommand(cmd.Cmd):
             return
         print(storage.all()[key])
 
-    def do_create(self, arg):
+    def do_destroy(self, arg):
         """
-        Create a new instance of BaseModel, User, State, City, Amenity,
-        Place, or Review,
-        saves it (to the JSON file), and prints the id.
-        Usage: create <Class name> <param 1> <param 2> <param 3>...
-        Param syntax: <key name>=<value>
+        Destroy an instance based on the class name and id.
         """
         args = arg.split()
         if not args:
             print("** class name missing **")
             return
-        class_name = args[0]
-        if class_name not in globals():
+        if args[0] not in globals():
             print("** class doesn't exist **")
             return
-        params = args[1:]
-
-        new_instance = eval(class_name)()
-        for param in params:
-            key, value = param.split('=')
-            value = value.strip('"')
-            if value.replace('.', '', 1).isdigit():
-                if '.' in value:
-                    value = float(value)
-                else:
-                    value = int(value)
-            elif '_' in value:
-                value = value.replace('_', ' ')
-            setattr(new_instance, key, value)
-
-        new_instance.save()
-        print(new_instance.id)
+        if len(args) < 2:
+            print("** instance id missing **")
+            return
+        key = f"{args[0]}.{args[1]}"
+        if key not in storage.all():
+            print("** no instance found **")
+            return
+        del storage.all()[key]
+        storage.save()
 
     def do_all(self, arg):
         """
@@ -122,12 +122,12 @@ class HBNBCommand(cmd.Cmd):
         if arg:
             instances = {key: val for key, val in instances.items()
                          if key.startswith(arg)}
-        print([str(obj) for obj in instances.values()])
+        print([str(val) for val in instances.values()])
 
     def do_update(self, arg):
         """
-        Update an instance based on the class name and id by
-        adding or updating attribute.
+        Update an instance based on the class name and id
+        by adding or updating attribute.
         """
         args = arg.split()
         if not args:
@@ -150,7 +150,14 @@ class HBNBCommand(cmd.Cmd):
             print("** value missing **")
             return
         instance = storage.all()[key]
-        setattr(instance, args[2], args[3])
+        value = args[3]
+        if value[0] == '"':
+            value = value.strip('"').replace('\\"', '"')
+        elif '.' in value:
+            value = float(value)
+        else:
+            value = int(value)
+        setattr(instance, args[2], value)
         instance.save()
 
 
