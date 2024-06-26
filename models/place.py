@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Place Module for the project
+Place module
 """
 from sqlalchemy import Column, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
@@ -12,6 +12,8 @@ class Place(BaseModel, Base):
     Place class that inherits from BaseModel and Base.
     """
     __tablename__ = 'places'
+
+
     city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
     user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
     name = Column(String(128), nullable=False)
@@ -27,8 +29,8 @@ class Place(BaseModel, Base):
     @property
     def reviews(self):
         """
-        Returns the list of Review instances with
-        place_id equals to the current Place.id
+        Returns the list of Review instances with place_id
+        equals to the current Place.id
         """
         from models import storage
         review_list = []
