@@ -16,10 +16,8 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-"""
-classes = {"Amenity": Amenity, "City": City,
-"Place": Place, "Review": Review, "State": State, "User": User}
-"""
+cls_dfn = {"Review": Review, "Amenity": Amenity, "State": State,
+           "City": City, "Place": Place, "User": User}
 
 
 class DBStorage:
@@ -50,8 +48,6 @@ class DBStorage:
         """
         query current database session
         """
-        cls_dfn = {"Review": Review, "Amenity": Amenity,
-                   "State": State, "City": City, "Place": Place, "User": User}
         new_dict = {}
         for clss in cls_dfn:
             if cls is None or cls is cls_dfn[clss] or cls is clss:
