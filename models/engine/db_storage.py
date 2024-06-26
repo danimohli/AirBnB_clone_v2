@@ -16,8 +16,8 @@ import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-cls_dfn = {"Review": Review, "Amenity": Amenity, "State": State,
-           "City": City, "Place": Place, "User": User}
+clas = {"Amenity": Amenity, "City": City,
+        "Place": Place, "Review": Review, "State": State, "User": User}
 
 
 class DBStorage:
@@ -49,9 +49,9 @@ class DBStorage:
         query current database session
         """
         new_dict = {}
-        for clss in cls_dfn:
-            if cls is None or cls is cls_dfn[clss] or cls is clss:
-                objs = self.__session.query(cls_dfn[clss]).all()
+        for clss in clas:
+            if cls is None or cls is clas[clss] or cls is clss:
+                objs = self.__session.query(clas[clss]).all()
                 for obj in objs:
                     key = obj.__class__.__name__ + '.' + obj.id
                     new_dict[key] = obj

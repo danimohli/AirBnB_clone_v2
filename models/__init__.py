@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 """
-Initialize the models package
+initialize the models package
 """
 
 from os import getenv
+
 
 storage_t = getenv("HBNB_TYPE_STORAGE")
 
