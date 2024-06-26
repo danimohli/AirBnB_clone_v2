@@ -1,6 +1,7 @@
 #!/usr/bin/python3
+
 """
-Cmd or Shell for HBH
+Cmd or Shell for HBNB
 """
 
 import cmd
@@ -42,8 +43,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, arg):
         """
-        Create a new instance of BaseModel, User, State, City, Amenity,
-        Place, or Review,
+        Create a new instance of BaseModel, User, State, City,
+        Amenity, Place, or Review,
         saves it (to the JSON file), and prints the id.
         Usage: create <Class name> <param 1> <param 2> <param 3>...
         Param syntax: <key name>=<value>
@@ -57,7 +58,6 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return
         params = args[1:]
-
         new_instance = eval(class_name)()
         for param in params:
             key, value = param.split('=')
@@ -70,7 +70,6 @@ class HBNBCommand(cmd.Cmd):
             elif '_' in value:
                 value = value.replace('_', ' ')
             setattr(new_instance, key, value)
-
         new_instance.save()
         print(new_instance.id)
 
