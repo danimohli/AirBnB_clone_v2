@@ -14,6 +14,12 @@ class User(BaseModel, Base if STORAGE_TYPE == 'db' else object):
     """
     This class defines a user by various attributes
     """
+     def __init__(self, *args, **kwargs):
+        """
+        initialize user
+        """
+        super().__init__(*args, **kwargs)
+    
     if STORAGE_TYPE == 'db':
         __tablename__ = 'users'
         email = Column(String(128), nullable=False)
