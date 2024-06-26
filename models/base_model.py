@@ -1,62 +1,75 @@
 #!/usr/bin/python3
 """
-Custom base class for the entire project
+Contains class BaseModel Updated
 """
 
-from uuid import uuid4
+import uuid
 from datetime import datetime
+from sqlalchemy import Column, String, DateTime
+from sqlalchemy.ext.declarative import declarative_base
 import models
+
+Base = declarative_base()
 
 
 class BaseModel:
     """
-    Basemodel for all the classes
+    The BaseModel class from which future
+    classes will be derived
     """
 
+    id = Column(String(60), primary_key=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
     def __init__(self, *args, **kwargs):
-        """Public instance artributes initialization
         """
-
-        dtf = '%Y-%m-%dT%H:%M:%S.%f'
-        if not kwargs:
-            self.id = str(uuid4())
-            self.created_at = datetime.utcnow()
-            self.updated_at = datetime.utcnow()
-            models.storage.new(self)
+        Initialization of the base model
+        """
+        if kwargs:
+            for key, value in kwargs.items():
+                if key != '__class__':
+                    setattr(self, key, value)
+            if 'id' not in kwargs:
+                self.id = str(uuid.uuid4())
+            if 'created_at' not in kwargs:
+                self.created_at = datetime.utcnow()
+            if 'updated_at' not in kwargs:
+                self.updated_at = datetime.utcnow()
         else:
-            for k, v in kwargs.items():
-                if k in ("updated_at", "created_at"):
-                    self.__dict__[k] = datetime.strptime(v, dtf)
-                elif k[0] == "id":
-                    self.__dict__[k] = str(v)
-                else:
-                    self.__dict__[k] = v
-
-    def __str__(self):
-        """
-        Returns string representation
-        """
-        return "[{}] ({}) {}".format(self.__class__.__name__,
-                                     self.id, self.__dict__)
+            self.id = str(uuid.uuid4())
+            self.created_at = self.updated_at = datetime.utcnow()
 
     def save(self):
         """
-        Updates the public instance attribute: updated_at
-        with the current datetime
+        Updates updated_at with current time
+        when instance is changed
         """
         self.updated_at = datetime.utcnow()
+        models.storage.new(self)
         models.storage.save()
 
     def to_dict(self):
         """
-        Method returns a dictionary containing all
-        keys/values of __dict__ instance
+        Convert instance into dict format
         """
-        obj_m = {}
-        for k, v in self.__dict__.items():
-            if k == "created_at" or k == "updated_at":
-                obj_m[k] = v.isoformat()
-            else:
-                obj_m[k] = v
-        obj_m["__class__"] = self.__class__.__name__
-        return obj_m
+        my_dict = self.__dict__.copy()
+        my_dict["__class__"] = str(type(self).__name__)
+        my_dict["created_at"] = self.created_at.isoformat()
+        my_dict["updated_at"] = self.updated_at.isoformat()
+        if "_sa_instance_state" in my_dict:
+            del my_dict["_sa_instance_state"]
+        return my_dict
+
+    def delete(self):
+        """
+        Delete the current instance from storage
+        """
+        models.storage.delete(self)
+
+    def __str__(self):
+        """
+        String representation of the BaseModel class
+        """
+        return "[{}] ({}) {}".format(type(self).__name__,
+                                     self.id, self.__dict__)
