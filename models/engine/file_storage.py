@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+"""
+Contains the FileStorage class
+Comment for module
+"""
 import json
 from models.base_model import BaseModel
 from models.user import User
@@ -61,4 +65,4 @@ class FileStorage:
             key = obj.__class__.__name__ + '.' + obj.id
             if key in self.__objects:
                 del self.__objects[key]
-                self.reload()
+                self.save()
