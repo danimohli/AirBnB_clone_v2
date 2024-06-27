@@ -1,18 +1,9 @@
 #!/usr/bin/python3
-"""
-Amenity module
-"""
-from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
-from models.base_model import BaseModel, Base
-from models.place import place_amenity
+from models.base_model import BaseModel
 
 
-class Amenity(BaseModel, Base):
+class Amenity(BaseModel):
     """
-    Amenity class that inherits from BaseModel and Base.
+    Amenity class that inherits from BaseModel.
     """
-    __tablename__ = 'amenities'
-    name = Column(String(128), nullable=False)
-    place_amenities = relationship('Place', secondary=place_amenity,
-                                   viewonly=False, back_populates='amenities')
+    name = ""
