@@ -11,11 +11,13 @@ class State(BaseModel, Base):
     __tablename__ = 'states'
 
     name = Column(String(128), nullable=False)
-    cities = relationship("City", backref="state", cascade="all, delete, delete-orphan")
+    cities = relationship("City", backref="state",
+                          cascade="all, delete, delete-orphan")
 
     @property
     def cities(self):
         """
         Getter attribute in case of FileStorage
         """
-        return [city for city in models.storage.all(City).values() if city.state_id == self.id]
+        return [city for city in models.storage.all(City).values()
+                if city.state_id == self.id]
