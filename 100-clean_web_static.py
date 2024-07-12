@@ -13,7 +13,7 @@ the specified number.
   - number (int): Number of most recent archives to keep.
   Default is 0, which keeps
     only the most recent archive.
-  
+
 Notes:
 - Local Cleanup: Removes archives from the 'versions' directory.
 - Remote Cleanup: Removes releases from '/data/web_static/releases'
@@ -54,4 +54,3 @@ def do_clean(number=0):
         archives = [a for a in archives if "web_static_" in a]
         [archives.pop() for i in range(number)]
         [run("rm -rf ./{}".format(a)) for a in archives]
-
