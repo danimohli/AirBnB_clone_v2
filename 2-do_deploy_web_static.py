@@ -34,8 +34,7 @@ def do_deploy(c, archive_path):
 
         # Extract archive to /data/web_static/releases/
         # <archive_filename_without_extension>/
-        archive_folder = archive_name.replace('.tgz',
-                                              '').replace('.tar.gz', '')
+        archive_folder = archive_name.replace('.tgz', '').replace('.tar.gz', '')
         remote_release_path = f"/data/web_static/releases/{archive_folder}"
         c.run(f"mkdir -p {remote_release_path}")
         c.run(f"tar -xzf {tmp_archive_path} -C {remote_release_path}")
