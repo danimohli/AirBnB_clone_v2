@@ -1,40 +1,54 @@
 #!/usr/bin/python3
 """
-archive from the contents of the web_static
+Fabric script to create a .tgz archive from the contents of the web_static folder.
+
+This script creates a timestamped .tgz archive of the web_static folder and stores
+it in the versions directory. The archive name format is web_static_<year><month><day>
+<hour><minute><second>.tgz. If successful, the function returns the path to the
+created archive. If an error occurs during the archive creation process, it returns None.
+
+Usage:
+    Execute this script using Fabric:
+        fab do_pack
 """
-from fabric import task
-from datetime import datetime
+
 import os
+from datetime import datetime
+from fabric.api import local, runs_once
 
-
-@task
-def do_pack(c):
+@runs_once
+def do_pack():
     """
-    Creates a .tgz archive from the contents of the web_static folder.
-    
-    Args:
-    - c (object): Fabric connection context.
-    
+    Archives the contents of the web_static folder into a .tgz file.
+
     Returns:
-    - str or None: Archive path if successful, None if there was an error.
+    - str or None: Path to the created archive if successful, None if there was an error.
     """
     try:
-        now = datetime.now().strftime('%Y%m%d%H%M%S')
-        archive_name = f'web_static_{now}.tgz'
+        # Ensure the versions directory exists
+        if not os.path.isdir("versions"):
+            os.mkdir("versions")
         
-        # Create versions directory if it doesn't exist
-        c.run('mkdir -p versions')
+        # Generate timestamp
+        now = datetime.now()
+        timestamp = now.strftime("%Y%m%d%H%M%S")
         
-        # Create .tgz archive
-        c.run(f'tar -cvzf versions/{archive_name} web_static')
+        # Construct archive name
+        archive_name = f"web_static_{timestamp}.tgz"
+        archive_path = os.path.join("versions", archive_name)
         
-        archive_path = os.path.join('versions', archive_name)
+        # Print information about packing
+        print(f"Packing web_static to {archive_path}")
         
-        # Check if archive was created successfully
-        if c.exists(archive_path):
-            return archive_path
-        else:
-            return None
+        # Create the .tgz archive
+        local(f"tar -cvzf {archive_path} web_static")
+        
+        # Get the size of the created archive
+        size = os.stat(archive_path).st_size
+        print(f"web_static packed: {archive_path} -> {size} Bytes")
+        
+        return archive_path
+    
     except Exception as e:
-        print(f"Error occurred: {e}")
+        print(f"Error packing web_static: {e}")
         return None
