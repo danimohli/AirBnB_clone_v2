@@ -1,56 +1,77 @@
 #!/usr/bin/python3
 """
-Fabric script to deploy an archive to web servers.
+Fabric script to distribute an archive to remote web servers and deploy it.
+
+This script connects to remote servers
+defined in env.hosts and deploys a specified
+archive to update the web application's static content.
+It performs the following steps:
+1. Uploads the archive to the /tmp/ directory on each server.
+2. Uncompresses the archive to
+/data/web_static/releases/<archive_filename_without_extension>/.
+3. Deletes the uploaded archive from the server.
+4. Updates the symbolic link /data/web_static/current
+to point to the deployed version.
+
+Requirements:
+- Fabric must be installed (pip install fabric).
+- Ensure SSH access and appropriate permissions are set on the remote servers.
+
+Usage:
+- Run this script using Fabric:
+    fab -f <script_name.py> do_deploy:/path/to/your/archive.tgz
 """
-import os
-from fabric import task, Connection
+
 from datetime import datetime
+from fabric.api import env, put, run
+import os
 
-# Define the web server IPs
-env.hosts = ['<IP web-01>', '<IP web-02>']
+# Define remote hosts and user
+env.hosts = ["100.26.221.187", "54.172.185.100"]
+env.user = "ubuntu"
 
 
-@task
-def do_deploy(c, archive_path):
+def do_deploy(archive_path):
     """
     Distributes an archive to web servers and deploys it.
 
     Args:
-    - c (object): Fabric connection context.
     - archive_path (str): Local path to the archive to deploy.
 
     Returns:
     - bool: True if deployment was successful, False otherwise.
     """
-    if not os.path.exists(archive_path):
-        print(f"Archive file '{archive_path}' does not exist.")
-        return False
+    if os.path.exists(archive_path):
+        try:
+            archive_filename = os.path.basename(archive_path)
+            archive_name = os.path.splitext(archive_filename)[0]
+            remote_path = f"/data/web_static/releases/{archive_name}"
 
-    try:
-        # Upload the archive to /tmp/ directory on the web servers
-        archive_name = os.path.basename(archive_path)
-        tmp_archive_path = f"/tmp/{archive_name}"
-        c.put(archive_path, tmp_archive_path)
+            put(archive_path, "/tmp/")
 
-        # Extract archive to /data/web_static/releases/
-        # <archive_filename_without_extension>/
-        archive_folder = archive_name.replace('.tgz', '').replace('.tar.gz', '')
-        remote_release_path = f"/data/web_static/releases/{archive_folder}"
-        c.run(f"mkdir -p {remote_release_path}")
-        c.run(f"tar -xzf {tmp_archive_path} -C {remote_release_path}")
+            run(f"sudo mkdir -p {remote_path}")
 
-        # Delete the archive from the web servers
-        c.run(f"rm {tmp_archive_path}")
+            run(f"sudo tar -xzf /tmp/{archive_filename} -C {remote_path}/")
 
-        # Delete the current symbolic link
-        c.run("rm -rf /data/web_static/current")
+            run(f"sudo rm /tmp/{archive_filename}")
 
-        # Create a new symbolic link pointing to the deployed archive
-        c.run(f"ln -s {remote_release_path} /data/web_static/current")
+            # Move contents to proper location
+            run(f"sudo mv {remote_path}/web_static/* {remote_path}/")
 
-        print("New version deployed successfully!")
-        return True
+            # Remove empty web_static directory
+            run(f"sudo rm -rf {remote_path}/web_static")
 
-    except Exception as e:
-        print(f"Error deploying: {e}")
+            # Update symbolic link
+            run("sudo rm -rf /data/web_static/current")
+            run(f"sudo ln -s {remote_path} /data/web_static/current")
+
+            print("New version deployed successfully!")
+            return True
+
+        except Exception as e:
+            print(f"Error deploying archive: {e}")
+            return False
+
+    else:
+        print(f"Local archive '{archive_path}' not found.")
         return False
