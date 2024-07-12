@@ -2,24 +2,30 @@
 """
 Fabfile to create and distribute an archive to a web server.
 
-This script defines functions to create a tar gzipped archive of the web_static directory
-and distribute it to specified remote web servers. It uses Fabric's API for file operations
+This script defines functions to create a tar gzipped
+archive of the web_static directory
+and distribute it to specified remote web servers.
+It uses Fabric's API for file operations
 and remote execution.
 
 Functions:
-- do_pack(): Creates a timestamped tar.gz archive of the web_static directory locally.
-  Returns the path to the archive if successful, or None if creation fails.
-  
-- do_deploy(archive_path): Distributes an archive to the remote web servers.
+- do_pack(): Creates a timestamped tar.gz
+archive of the web_static directory locally.
+  Returns the path to the archive if successful,
+  or None if creation fails.
+
+- do_deploy(archive_path): Distributes an
+archive to the remote web servers.
   Args:
   - archive_path (str): Path to the archive to distribute.
   Returns:
   - True if deployment succeeds, False otherwise.
-  
-- deploy(): Combines do_pack and do_deploy functions to automate archive creation and deployment.
+
+- deploy(): Combines do_pack and do_deploy functions to
+automate archive creation and deployment.
   Returns:
   - True if both packing and deployment succeed, False otherwise.
-  
+
 Requirements:
 - Fabric must be installed (`pip install fabric`).
 - Ensure SSH access and permissions are properly configured for remote servers.
