@@ -11,20 +11,25 @@ import os
 def do_pack(c):
     """
     Creates a .tgz archive from the contents of the web_static folder.
+    
+    Args:
+    - c (object): Fabric connection context.
+    
+    Returns:
+    - str or None: Archive path if successful, None if there was an error.
     """
     try:
-        # Generate timestamp
         now = datetime.now().strftime('%Y%m%d%H%M%S')
         archive_name = f'web_static_{now}.tgz'
-
+        
         # Create versions directory if it doesn't exist
         c.run('mkdir -p versions')
-
+        
         # Create .tgz archive
         c.run(f'tar -cvzf versions/{archive_name} web_static')
-
+        
         archive_path = os.path.join('versions', archive_name)
-
+        
         # Check if archive was created successfully
         if c.exists(archive_path):
             return archive_path
