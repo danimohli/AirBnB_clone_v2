@@ -1,54 +1,37 @@
 #!/usr/bin/env bash
-# Install Nginx if not already installed
+# Sets up a web server for deployment of web_static.
 
-if ! [ -x "$(command -v nginx)" ]; then
-    sudo apt-get update
-    sudo apt-get install -y nginx
-fi
+apt-get update
+apt-get install -y nginx
 
-# Create necessary directories if they don't exist
-sudo mkdir -p /data/web_static/releases/test /data/web_static/shared /data/web_static/current
+mkdir -p /data/web_static/releases/test/
+mkdir -p /data/web_static/shared/
+echo "Holberton School" > /data/web_static/releases/test/index.html
+ln -sf /data/web_static/releases/test/ /data/web_static/current
 
-# Create a fake HTML file for testing
-sudo echo "<html>
-  <head>
-  </head>
-  <body>
-    <p>Test HTML file for Nginx configuration setup.</p>
-  </body>
-</html>" | sudo tee /data/web_static/releases/test/index.html
+chown -R ubuntu /data/
+chgrp -R ubuntu /data/
 
-# Create symbolic link /data/web_static/current if it exists
-sudo ln -sf /data/web_static/releases/test /data/web_static/current
-
-# Give ownership of /data/ to ubuntu user and group
-sudo chown -R ubuntu:ubuntu /data/
-
-# Update Nginx configuration to serve content of /data/web_static/current
-config="server {
-    listen 80;
-    listen [::]:80;
-
-    server_name _;
-
-    location /hbnb_static/ {
-        alias /data/web_static/current/;
+# Additional configuration for nginx
+printf %s "server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    add_header X-Served-By \$HOSTNAME;
+    root   /var/www/html;
+    index  index.html index.htm;
+    location /hbnb_static {
+        alias /data/web_static/current;
+        index index.html index.htm;
     }
-
+    location /redirect_me {
+        return 301 http://cuberule.com/;
+    }
     error_page 404 /404.html;
-    location = /404.html {
-        root /usr/share/nginx/html;
+    location /404 {
+        root /var/www/html;
         internal;
     }
-}"
+}" > /etc/nginx/sites-available/default
 
-# Remove default configuration and replace with new configuration
-sudo rm -f /etc/nginx/sites-enabled/default
-sudo echo "$config" | sudo tee /etc/nginx/sites-available/web_static
-sudo ln -sf /etc/nginx/sites-available/web_static /etc/nginx/sites-enabled/
-
-# Restart Nginx to apply changes
-sudo service nginx restart
-
-# Exit successfully
-exit 0
+# Restart nginx to apply changes
+service nginx restart
