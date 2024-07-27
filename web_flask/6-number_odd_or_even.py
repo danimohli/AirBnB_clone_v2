@@ -10,7 +10,7 @@ app = Flask(__name__)
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
     """
-    Returns a greeting message 'Hello HBNB!'
+    Returns the greeting message 'Hello HBNB!'.
     """
     return "Hello HBNB!"
 
@@ -18,7 +18,7 @@ def hello_hbnb():
 @app.route('/hbnb', strict_slashes=False)
 def hbnb():
     """
-    Returns the message 'HBNB'
+    Returns the message 'HBNB'.
     """
     return "HBNB"
 
@@ -48,7 +48,7 @@ def number(n):
     """
     Returns 'n is a number' only if n is an integer.
     """
-    return "{:d} is a number".format(n)
+    return "{} is a number".format(n)
 
 
 @app.route('/number_template/<int:n>', strict_slashes=False)
@@ -66,8 +66,8 @@ def number_odd_or_even(n):
     Renders an HTML page only if n is an integer.
     The HTML page contains an H1 tag with 'Number: n is even|odd'.
     """
-    parity = "even" if n % 2 == 0 else "odd"
-    return render_template('6-odd_or_even.html', n=n, parity=parity)
+    parity = 'even' if n % 2 == 0 else 'odd'
+    return render_template('6-number_odd_or_even.html', n=n, parity=parity)
 
 
 if __name__ == "__main__":
