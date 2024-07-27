@@ -67,7 +67,7 @@ def number_odd_or_even(n):
     The HTML page contains an H1 tag with 'Number: n is even|odd'.
     """
     parity = "even" if n % 2 == 0 else "odd"
-    return render_template('6-odd_or_even.html', n=n, parity=parity)
+    return render_template('odd_or_even.html', n=n, parity=parity)
 
 
 if __name__ == "__main__":
