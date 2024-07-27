@@ -48,10 +48,10 @@ def number(n):
     """
     Returns 'n is a number' only if n is an integer
     """
-    return "{:d} is a number".format(n)
+    return "{} is a number".format(n)
 
 
-@app.route('/hello_route/<int:n>', strict_slashes=False)
+@app.route('/number_template/<int:n>', strict_slashes=False)
 def number_template(n):
     """
     Renders an HTML page only if n is an integer
