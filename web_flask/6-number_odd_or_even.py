@@ -62,11 +62,11 @@ def numbersandevenness(n):
     display a HTML page only if n is an integer
     """
     if n % 2 == 0:
-        stat = 'even'
+        evenness = 'even'
     else:
-        stat = 'odd'
+        evenness = 'odd'
     return render_template('6-number_odd_or_even.html', n=n,
-                           stat=stat)
+                           evenness=evenness)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5000')
