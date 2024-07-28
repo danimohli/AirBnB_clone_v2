@@ -1,28 +1,23 @@
 #!/usr/bin/python3
-"""
-State class for managing State objects.
-"""
-
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from models.base_model import Base, BaseModel
-from models.city import City
+from models.base_model import BaseModel, Base
 
 
 class State(BaseModel, Base):
     """
-    Represents a state.
+    State class that inherits from BaseModel and Base.
     """
-
     __tablename__ = 'states'
-    name = Column(String(128), nullable=False)
-    cities = relationship("City", backref="state", cascade="all, delete, delete-orphan")
 
+    name = Column(String(128), nullable=False)
+    cities = relationship("City", backref="state",
+                          cascade="all, delete, delete-orphan")
+
+    @property
     def cities(self):
         """
-        Returns a list of City objects linked to the current State.
+        Getter attribute in case of FileStorage
         """
-        if isinstance(storage, DBStorage):
-            return [city for city in storage.all(City).values() if city.state_id == self.id]
-        else:
-            return [city for city in storage.all(City).values() if city.state_id == self.id]
+        return [city for city in models.storage.all(City).values()
+                if city.state_id == self.id]
