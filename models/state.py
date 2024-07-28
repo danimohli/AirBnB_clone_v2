@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-This module defines the State class which represents a state.
-"""
+""" holds class State"""
 import models
 from models.base_model import BaseModel, Base
 from models.city import City
@@ -12,10 +10,7 @@ from sqlalchemy.orm import relationship
 
 
 class State(BaseModel, Base):
-    """
-    Represents a state in the database or file storage.
-    """
-
+    """Representation of state """
     if models.storage_t == "db":
         __tablename__ = 'states'
         name = Column(String(128), nullable=False)
@@ -24,17 +19,13 @@ class State(BaseModel, Base):
         name = ""
 
     def __init__(self, *args, **kwargs):
-        """
-        Initializes a new state.
-        """
+        """initializes state"""
         super().__init__(*args, **kwargs)
 
     if models.storage_t != "db":
         @property
         def cities(self):
-            """
-            Returns a list of City instances related to the state.
-            """
+            """getter for list of city instances related to the state"""
             city_list = []
             all_cities = models.storage.all(City)
             for city in all_cities.values():

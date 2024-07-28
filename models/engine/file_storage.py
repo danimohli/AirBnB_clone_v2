@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """
-This module defines the FileStorage class which handles serialization and
-deserialization of instances to and from JSON files.
+Contains the FileStorage class
 """
 
 import json
@@ -18,19 +17,15 @@ classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
 
 
 class FileStorage:
-    """
-    Handles storage of all class instances in a JSON file.
-    """
+    """serializes instances to a JSON file & deserializes back to instances"""
 
-    # String - path to the JSON file
+    # string - path to the JSON file
     __file_path = "file.json"
-    # Dictionary - will store all objects by <class name>.id
+    # dictionary - empty but will store all objects by <class name>.id
     __objects = {}
 
     def all(self, cls=None):
-        """
-        Returns the dictionary __objects, optionally filtered by cls.
-        """
+        """returns the dictionary __objects"""
         if cls is not None:
             new_dict = {}
             for key, value in self.__objects.items():
@@ -40,17 +35,13 @@ class FileStorage:
         return self.__objects
 
     def new(self, obj):
-        """
-        Sets obj in __objects with key <obj class name>.id.
-        """
+        """sets in __objects the obj with key <obj class name>.id"""
         if obj is not None:
             key = obj.__class__.__name__ + "." + obj.id
             self.__objects[key] = obj
 
     def save(self):
-        """
-        Serializes __objects to the JSON file (path: __file_path).
-        """
+        """serializes __objects to the JSON file (path: __file_path)"""
         json_objects = {}
         for key in self.__objects:
             json_objects[key] = self.__objects[key].to_dict()
@@ -58,26 +49,22 @@ class FileStorage:
             json.dump(json_objects, f)
 
     def reload(self):
-        """
-        Deserializes the JSON file to __objects.
-        """
+        """deserializes the JSON file to __objects"""
         try:
             with open(self.__file_path, 'r') as f:
                 jo = json.load(f)
             for key in jo:
                 self.__objects[key] = classes[jo[key]["__class__"]](**jo[key])
+        except:
+            pass
 
     def delete(self, obj=None):
-        """
-        Deletes obj from __objects if it's inside.
-        """
+        """delete obj from __objects if it’s inside"""
         if obj is not None:
             key = obj.__class__.__name__ + '.' + obj.id
             if key in self.__objects:
                 del self.__objects[key]
 
     def close(self):
-        """
-        Calls reload() method for deserializing the JSON file to objects.
-        """
+        """call reload() method for deserializing the JSON file to objects"""
         self.reload()
