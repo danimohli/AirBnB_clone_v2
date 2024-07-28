@@ -4,14 +4,16 @@ Contains the FileStorage class
 """
 
 import json
-from models.base_model import BaseModel
-from models.user import User
-from models.state import State
-from models.city import City
 from models.amenity import Amenity
+from models.base_model import BaseModel
+from models.city import City
 from models.place import Place
 from models.review import Review
+from models.state import State
+from models.user import User
 
+classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
+           "Place": Place, "Review": Review, "State": State, "User": User}
 
 class FileStorage:
     """
@@ -28,7 +30,7 @@ class FileStorage:
         """
         if cls:
             if isinstance(cls, str):
-                cls = eval(cls)
+                cls = classes.get(cls)
             return {key: value for key, value in self.__objects.items()
                     if isinstance(value, cls)}
         return self.__objects
@@ -59,8 +61,7 @@ class FileStorage:
                 temp = json.load(f)
                 for key, val in temp.items():
                     cls_name = val["__class__"]
-                    del val["__class__"]
-                    self.__objects[key] = eval(cls_name)(**val)
+                    self.__objects[key] = classes[cls_name](**val)
         except FileNotFoundError:
             pass
 
@@ -79,3 +80,4 @@ class FileStorage:
         Call reload() method for deserializing the JSON file to objects
         """
         self.reload()
+

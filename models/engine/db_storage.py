@@ -11,6 +11,10 @@ from models.city import City
 from models.state import State
 from models.user import User
 from models.place import Place
+from models.amenity import Amenity
+from models.review import Review
+
+classes = {"Amenity": Amenity, "City": City, "State": State, "User": User, "Place": Place, "Review": Review}
 
 
 class DBStorage:
@@ -44,13 +48,10 @@ class DBStorage:
         Query on the current database session
         """
         new_dict = {}
-        if cls:
-            for obj in self.__session.query(cls).all():
-                key = obj.__class__.__name__ + '.' + obj.id
-                new_dict[key] = obj
-        else:
-            for sub_cls in [State, City, User, Place]:
-                for obj in self.__session.query(sub_cls).all():
+        for clss in classes:
+            if cls is None or cls is classes[clss] or cls is clss:
+                objs = self.__session.query(classes[clss]).all()
+                for obj in objs:
                     key = obj.__class__.__name__ + '.' + obj.id
                     new_dict[key] = obj
         return new_dict
